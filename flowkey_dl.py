@@ -10,7 +10,18 @@ import os
 from PIL.PngImagePlugin import PngImageFile, PngInfo
 
 def flowkey_dl(url):
-    url=os.path.dirname(url)+'/{}.png'
+    #url=os.path.dirname(url)+'/{}.png'
+    hashstring=strip_url(url)
+    try:
+        filename=f'raw/{hashstring}.png'
+        img=PngImageFile(filename)
+    except FileNotFoundError:
+        pass
+    else:
+        print(f'found local file {filename}')
+        return np.array(img),img.info.get('Title'),img.info.get('Author')
+    url=make_url(hashstring)
+    #load with 
     imgs=list()
     i=0
     while True:   
@@ -18,19 +29,24 @@ def flowkey_dl(url):
         r = requests.get(url.format(i))
         if r.content[-6:-1]==b'Error':
             break
-        imgs.append(imageio.get_reader(r.content, '.png'))
-        #imgs.append(Image.open(BytesIO(r.content)))
-        i+=1
+        patch=next(iter(imageio.get_reader(r.content, '.png')))
+        if len(patch.shape)==3:
+            imgs.append(patch)            
+            i+=1
     print(f'downloaded {i} patches form {url}')
-    imgs_comb = np.hstack( [next(iter( i )) for i in imgs ] )
+    #print([i.shape for i in imgs])
+
+    imgs_comb = np.hstack( imgs  )
     r,g,b,a=np.rollaxis(imgs_comb, axis=-1)
-    return 255-a
+    return 255-a, None, None
 
 def find_measure(image, min_sz=100):
     #image is a numpy array
     #there are about 20 pixel above and 15 below the lines. 
     # at most 5 pixels can be brighter than 100
-    positions=np.where((image>100)[50:-50,:].sum(0)<10)[0]
+    lines=np.where((image>100)[:,50:-50].sum(1)<image.shape[1]/2)[0]
+
+    positions=np.where((image>100)[lines[0]:lines[-1],:].sum(0)<10)[0]
     measures=[positions[0]]
     for i in positions:
         if i> measures[-1]+min_sz:
@@ -41,18 +57,20 @@ def find_measure(image, min_sz=100):
 def parse_nums(val=None):
     #parse strings like '1,3,6-10,15'
     nums=[]
-    if val is not None and val:
-        for v in val.split(','):
-            if '-' in v:
-                _from, to= v.split('-')
-                nums.extend(list(range(int(_from), int(to)+1)))
-            else:
-                nums.append(int(v))
+    try:
+        if val is not None and val:
+            for v in val.split(','):
+                if '-' in v:
+                    _from, to= v.split('-')
+                    nums.extend(list(range(int(_from), int(to)+1)))
+                else:
+                    nums.append(int(v))
+    except ValueError:
+        return []
     return nums
 
 
-def arange_image(image=None, title='', author='',width=2480, height=3508, scale=1,space=50, sel_measures=None,break_measures=None, nobreak_measures=None,font_size=(40,20) ):
-    mar=20
+def arange_image(image=None, title='', author='',width=2480, height=3508, scale=1,space=50, sel_measures=None,break_measures=None, nobreak_measures=None,font_size=(40,20) , mar=50):
     sel_measures,break_measures, nobreak_measures=[parse_nums(val) for val in (sel_measures,break_measures, nobreak_measures)]
     out=[Image.fromarray(255*np.ones((int(height),int(width))))]
     fnt = [ImageFont.truetype('Pillow/Tests/fonts/FreeMono.ttf', sz) for sz in font_size]
@@ -68,7 +86,7 @@ def arange_image(image=None, title='', author='',width=2480, height=3508, scale=
     measures=find_measure(image)
     if sel_measures:
         print(f'selecting measures {sel_measures}')
-        image=np.hstack([image[:,measures[m-1]:measures[m]] for m in sel_measures])
+        image=np.hstack([image[:,measures[m-1]:measures[m]] for m in sel_measures if m<len(measures)])
         #offset=0
         rm=[0]
         #new_measures=list()
@@ -92,34 +110,57 @@ def arange_image(image=None, title='', author='',width=2480, height=3508, scale=
                 breaks.append(measures[i])
             offset=breaks[-1]
     breaks.append(image.shape[1])
-    offset=measures[0]
+    offset=max(0,measures[0]-1)
     y=int(mar+h+h2+space/2)
     for i,ix in enumerate(breaks):
         print(f'{offset}, {ix}')
-        if y>height-mar:
+        if y+image.shape[0]+mar>height:
             out.append(Image.fromarray(255*np.ones((int(height),int(width)))))
             y=mar
-        patch=image[:,offset:ix+10]
+        patch=image[:,offset:ix+1]
         dim=patch.shape
         patch=Image.fromarray(patch)
         patch=patch.resize((int(x*scale) for x in reversed(dim)))
         out[-1].paste(patch, (mar,y)) 
         y+=patch.height+space
-
-        offset=ix-10    
+        offset=ix-1    
     return out
 
 def load_image(filename):
     img=PngImageFile(filename)
     return(img)
 
+def strip_url(url):
+    if url.startswith('https://flowkeycdn.com/sheets/'):
+        url=url[30:]
+        if '/' in url:
+            url=url[:url.find('/')]
+    return url
 
-def save_image(image, filename, author, title):
+def make_url(hashstring, dpi=300):
+    if dpi!=300:
+        dpi=150
+    return f'https://flowkeycdn.com/sheets/{hashstring}/{dpi}/'+'{}.png'
+
+
+def save_png(image, url, author, title):
     metadata = PngInfo()
     metadata.add_text("Title", title)
     metadata.add_text("Author", author)
+    filename=f'raw/{strip_url(url)}.png'
     Image.fromarray(image).save(filename, pnginfo=metadata) 
     #load with PngImageFile(filename)
+
+def save_pdf(images, url, author, title):
+#def makePdf(pdfFileName, listPages, dir = ''):
+    filename=f'sheets/{author.lower().replace(" ","_")}_{title.lower().replace(" ","_")}_{strip_url(url)}.pdf'
+    images=[i.convert('RGB') for i in images]
+    if len(images)==1:
+        images[0].save(filename)
+    else:
+        images[0].save(filename,save_all=True, append_images=images[1:])
+
+
 
 if __name__ == "__main__":
     url = 'https://flowkeycdn.com/sheets/XXXXX/150/0.png'
