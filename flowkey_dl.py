@@ -24,16 +24,19 @@ def flowkey_dl(url):
     #load with 
     imgs=list()
     i=0
-    while True:   
+    while True:
         #im = imageio.imread(url.format(i)) 
         r = requests.get(url.format(i))
         if r.content[-6:-1]==b'Error':
             break
         patch=next(iter(imageio.get_reader(r.content, '.png')))
+        print(f'loaded patch {i} with shape {patch.shape}')   
         if len(patch.shape)==3:
             imgs.append(patch)            
-            i+=1
-    print(f'downloaded {i} patches form {url}')
+        else:
+            print(f'patch {i} looks strange, ignoring: {patch} \nshape: {patch.shape}')
+        i+=1
+    print(f'downloaded {len(imgs)} patches form {url}')
     #print([i.shape for i in imgs])
 
     imgs_comb = np.hstack( imgs  )
