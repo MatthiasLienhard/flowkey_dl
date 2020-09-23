@@ -3,7 +3,7 @@
 from tkinter import *
 from tkinter import ttk
 import sys
-from flowkey_dl import flowkey_dl, arange_image, save_png, save_pdf
+from .flowkey_dl import flowkey_dl, arange_image, save_png, save_pdf
 import os
 from PIL import ImageTk
 
@@ -177,9 +177,10 @@ class MainWindow(object):
         self.canvas.itemconfig(self.prev_area, image = self.prev_img[self.current_page])
        
 
-
-
-if __name__ == "__main__":
+def main():
     root=Tk()
     m=MainWindow(root)
     root.mainloop()
+
+if __name__ == "__main__":
+    main()

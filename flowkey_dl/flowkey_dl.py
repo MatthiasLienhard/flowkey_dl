@@ -163,12 +163,14 @@ def save_pdf(images, url, author, title):
     else:
         images[0].save(filename,save_all=True, append_images=images[1:])
 
-
-
-if __name__ == "__main__":
+def main():
     url = 'https://flowkeycdn.com/sheets/XXXXX/150/0.png'
     image=flowkey_dl(url)
     measure=find_measure(image)
     r,g,b=[image.copy() for _ in range(3)]
     r[:,measure]=255
     Image.fromarray( np.dstack([r,g,b])).show()
+
+
+if __name__ == "__main__":
+    main()
