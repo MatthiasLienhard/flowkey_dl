@@ -1,5 +1,6 @@
 #!/bin/python3
 import requests
+import pkg_resources
 
 import imageio
 
@@ -13,7 +14,7 @@ def flowkey_dl(url):
     #url=os.path.dirname(url)+'/{}.png'
     hashstring=strip_url(url)
     try:
-        filename=f'raw/{hashstring}.png'
+        filename=pkg_resources.resource_filename(__name__, f'raw/{hashstring}.png')
         img=PngImageFile(filename)
     except FileNotFoundError:
         pass
@@ -150,14 +151,14 @@ def save_png(image, url, author, title):
     metadata = PngInfo()
     metadata.add_text("Title", title)
     metadata.add_text("Author", author)
-    filename=f'raw/{strip_url(url)}.png'
+    filename=pkg_resources.resource_filename(__name__, f'raw/{strip_url(url)}.png')
+    print(f'saving raw image of sheet {author} - {title} to {filename}')
     Image.fromarray(image).save(filename, pnginfo=metadata) 
     #load with PngImageFile(filename)
 
-def save_pdf(images, url, author, title):
-#def makePdf(pdfFileName, listPages, dir = ''):
-    filename=f'sheets/{author.lower().replace(" ","_")}_{title.lower().replace(" ","_")}_{strip_url(url)}.pdf'
+def save_pdf(images, filename):
     images=[i.convert('RGB') for i in images]
+    print(f'saving {len(images)} pages to {filename}')
     if len(images)==1:
         images[0].save(filename)
     else:

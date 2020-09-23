@@ -1,9 +1,9 @@
 #!/bin/python3
 
 from tkinter import *
-from tkinter import ttk
+from tkinter import ttk,filedialog
 import sys
-from .flowkey_dl import flowkey_dl, arange_image, save_png, save_pdf
+from .flowkey_dl import flowkey_dl, arange_image, save_png, save_pdf,strip_url
 import os
 from PIL import ImageTk
 
@@ -126,7 +126,10 @@ class MainWindow(object):
         #save raw
         save_png(self.image, self.url.get(), self.artist.get(), self.title.get())
         #save processed
-        save_pdf(self.processed_images,  self.url.get(),self.artist.get(), self.title.get())
+        filename=f'{self.artist.get().lower().replace(" ","_")}_{self.title.get().lower().replace(" ","_")}_{strip_url(self.url.get())}.pdf'
+        path=filedialog.asksaveasfilename( defaultextension=".pdf", initialfile=filename)
+        if path is not None: # asksaveasfile return `None` if dialog closed with "cancel".
+            save_pdf(self.processed_images,  path)
         
 
     def pre_img(self):
