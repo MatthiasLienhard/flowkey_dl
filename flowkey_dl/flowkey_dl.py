@@ -77,7 +77,15 @@ def parse_nums(val=None):
 def arange_image(image=None, title='', author='',width=2480, height=3508, scale=1,space=50, sel_measures=None,break_measures=None, nobreak_measures=None,font_size=(40,20) , mar=50):
     sel_measures,break_measures, nobreak_measures=[parse_nums(val) for val in (sel_measures,break_measures, nobreak_measures)]
     out=[Image.fromarray(255*np.ones((int(height),int(width))))]
-    fnt = [ImageFont.truetype('FreeMono.ttf', sz) for sz in font_size]
+    try:
+        fnt = [ImageFont.truetype('FreeMono.ttf', sz) for sz in font_size]
+    except OSError:
+        try:
+            fnt = [ImageFont.truetype('arial.ttf', sz) for sz in font_size]
+        except OSError:
+            print('Can not load arial nor FreeMono ttf fonts... using default font and font size. To circumvent this, try installing FreeMono or arial ttf fonts')
+            fnt = [ImageFont.load_default() for sz in font_size]
+    
     d = ImageDraw.Draw(out[-1])
     w, h = d.textsize(title, font=fnt[0])
     d.text(((width-w)/2,mar),title, font=fnt[0], fill=0)
