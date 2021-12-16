@@ -3,7 +3,7 @@
 from tkinter import *
 from tkinter import ttk,filedialog
 import sys
-from .flowkey_dl import flowkey_dl, arange_image, save_png, save_pdf,strip_url
+from flowkey_dl import flowkey_dl, arange_image, save_png, save_pdf,strip_url
 import os
 from PIL import ImageTk
 
