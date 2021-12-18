@@ -9,14 +9,14 @@ with open(path.join(this_directory, 'requirements.txt'), encoding='utf-8') as f:
 
 setuptools.setup(
     name="flowkey_dl",
-    version="0.0.2",
+    version="0.0.3",
     author="Matthias Lienhard",
     author_email="mali270484@gmail.com",
     description="A python app to download sheet music from flowkey and save it as pdf.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     packages=setuptools.find_packages(),
-    package_data={'flowkey_dl':['raw/*png']},
+    package_data={'flowkey_dl':['raw/*.png','raw/*.md' ]},
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
