@@ -1,8 +1,8 @@
-import sys
 import argparse
 from flowkey_dl import flowkey_dl, arange_image, save_pdf
 
-if __name__ == "__main__":
+
+def main():
     parser = argparse.ArgumentParser(description="Sheet Music downloader for flowkey")
     parser.add_argument(
         "baseurl", help="Flowkey sheet music base url (url of first image)"
@@ -30,3 +30,7 @@ if __name__ == "__main__":
     image, _, _ = flowkey_dl(args.baseurl)
     processed_image = arange_image(image, title, artist)
     save_pdf(processed_image, pdf_path)
+
+
+if __name__ == "__main__":
+    main()
