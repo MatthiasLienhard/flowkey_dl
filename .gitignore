@@ -1,0 +1,4 @@
+/venv
+flowkey_dl/__pycache__
+.vscode/
+flowkey_dl/raw/
