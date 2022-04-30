@@ -5,6 +5,7 @@ import pkg_resources
 import imageio
 
 from PIL import Image, ImageDraw, ImageFont
+from matplotlib import font_manager
 from io import BytesIO
 import numpy as np
 import os
@@ -95,17 +96,9 @@ def arange_image(
         parse_nums(val) for val in (sel_measures, break_measures, nobreak_measures)
     ]
     out = [Image.fromarray(255 * np.ones((int(height), int(width))))]
-    try:
-        fnt = [ImageFont.truetype("FreeMono.ttf", sz) for sz in font_size]
-    except OSError:
-        try:
-            fnt = [ImageFont.truetype("arial.ttf", sz) for sz in font_size]
-        except OSError:
-            print(
-                "Can not load arial nor FreeMono ttf fonts... using default font and font size. To circumvent this, try installing FreeMono or arial ttf fonts"
-            )
-            fnt = [ImageFont.load_default() for sz in font_size]
-
+    font_type = font_manager.FontProperties(family='serif')
+    font_file = font_manager.findfont(font_type)
+    fnt = [ImageFont.truetype(font_file, sz) for sz in font_size]
     d = ImageDraw.Draw(out[-1])
     w, h = d.textsize(title, font=fnt[0])
     d.text(((width - w) / 2, mar), title, font=fnt[0], fill=0)
