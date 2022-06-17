@@ -1,10 +1,9 @@
 #!/bin/python3
 
-from tkinter import *
-from tkinter import ttk, filedialog
-import sys
+from tkinter import Tk, ttk, filedialog
+from tkinter import Button, Frame, Label, Scale, Entry, Canvas
+from tkinter import HORIZONTAL, END, NW
 from flowkey_dl import flowkey_dl, arange_image, save_png, save_pdf, strip_url
-import os
 from PIL import ImageTk
 
 dim = {"A4 Landscape": (2338, 1652), "A4 Portrait": (1652, 2338)}
@@ -14,6 +13,7 @@ class MainWindow(object):
     def __init__(self, master):
         self._update = None
         self.master = master
+        self.master.title(flowkey_dl)
         self.song = Frame(master)
         self.song.grid(row=0, column=0)
         self.layout = Frame(master)
@@ -47,14 +47,16 @@ class MainWindow(object):
         self.size_lab = Label(layout, text="Page size")
         self.size_lab.grid(row=1, column=0)
         self.size = ttk.Combobox(layout, state="readonly", values=list(dim))
-        self.size.bind("<<ComboboxSelected>>", lambda event: self.update_preview(1))
+        self.size.bind("<<ComboboxSelected>>",
+                       lambda event: self.update_preview(1))
         self.size.set("A4 Portrait")
         self.size.grid(row=1, column=1, columnspan=2)
         self.width, self.height = dim[self.size.get()]
         self.scale_lab = Label(layout, text="sheet scale")
         self.scale_lab.grid(row=2, column=0)
         self.scale = Scale(
-            layout, from_=10, to=200, orient=HORIZONTAL, command=self.update_preview
+            layout, from_=10, to=200,
+            orient=HORIZONTAL, command=self.update_preview
         )
         self.scale.set(100)
         self.scale.grid(row=2, column=1, columnspan=2)
@@ -62,21 +64,24 @@ class MainWindow(object):
         self.font_sz_title_lab = Label(layout, text="Title font size")
         self.font_sz_title_lab.grid(row=3, column=0)
         self.font_sz_title = Scale(
-            layout, from_=10, to=100, orient=HORIZONTAL, command=self.update_preview
+            layout, from_=10, to=100,
+            orient=HORIZONTAL, command=self.update_preview
         )
         self.font_sz_title.set(50)
         self.font_sz_title.grid(row=3, column=1)
         self.font_sz_author_lab = Label(layout, text="Author font size")
         self.font_sz_author_lab.grid(row=4, column=0)
         self.font_sz_author = Scale(
-            layout, from_=10, to=100, orient=HORIZONTAL, command=self.update_preview
+            layout, from_=10, to=100,
+            orient=HORIZONTAL, command=self.update_preview
         )
         self.font_sz_author.set(30)
         self.font_sz_author.grid(row=4, column=1)
         self.space_lab = Label(layout, text="Spacing")
         self.space_lab.grid(row=5, column=0)
         self.space = Scale(
-            layout, from_=10, to=200, orient=HORIZONTAL, command=self.update_preview
+            layout, from_=10, to=200,
+            orient=HORIZONTAL, command=self.update_preview
         )
         self.space.set(50)
         self.space.grid(row=5, column=1, columnspan=2)
@@ -96,13 +101,15 @@ class MainWindow(object):
         self.measure_force = Entry(measure)
         self.measure_force.grid(row=3, column=1)
         self.apply_b = Button(
-            measure, text="apply", command=lambda x=None: self.update_preview(0)
+            measure, text="apply",
+            command=lambda x=None: self.update_preview(0)
         )
         self.apply_b.grid(row=4, column=0, columnspan=2)
         preview = self.preview
         self.prev_scale_frame = Frame(preview)
         self.prev_scale_frame.grid(row=0, column=0, columnspan=3)
-        self.prev_scale_lab = Label(self.prev_scale_frame, text="preview scale")
+        self.prev_scale_lab = Label(
+            self.prev_scale_frame, text="preview scale")
         self.prev_scale_lab.grid(row=0, column=0)
         self.prev_scale = Scale(
             self.prev_scale_frame,
@@ -120,7 +127,8 @@ class MainWindow(object):
         )  # 100 dpi
         self.prev_img = [
             ImageTk.PhotoImage(i)
-            for i in arange_image(width=self.prev_width, height=self.prev_height)
+            for i in arange_image(width=self.prev_width,
+                                  height=self.prev_height)
         ]
         self.prev_area = self.canvas.create_image(
             0, 0, anchor=NW, image=self.prev_img[self.current_page]
@@ -148,9 +156,13 @@ class MainWindow(object):
 
     def save(self):
         # save raw
-        save_png(self.image, self.url.get(), self.artist.get(), self.title.get())
+        save_png(self.image, self.url.get(),
+                 self.artist.get(), self.title.get())
         # save processed
-        filename = f'{self.artist.get().lower().replace(" ","_")}_{self.title.get().lower().replace(" ","_")}_{strip_url(self.url.get())}.pdf'
+        filename = '_'.join(
+            self.artist.get().lower().replace(" ", "_"),
+            self.title.get().lower().replace(" ", "_"),
+            strip_url(self.url.get()))+'.pdf'
         path = filedialog.asksaveasfilename(
             defaultextension=".pdf", initialfile=filename
         )
@@ -222,12 +234,13 @@ class MainWindow(object):
             for i in self.processed_images
         ]
         # self.canvas.create_image(0,0,anchor=NW,image=ImageTk.PhotoImage(image))
-        self.canvas.itemconfig(self.prev_area, image=self.prev_img[self.current_page])
+        self.canvas.itemconfig(
+            self.prev_area, image=self.prev_img[self.current_page])
 
 
 def main():
     root = Tk()
-    m = MainWindow(root)
+    MainWindow(root)
     root.mainloop()
 
 

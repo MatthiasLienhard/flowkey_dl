@@ -7,9 +7,13 @@ A python app to download sheet music from flowkey and save it as pdf.
 This is a python3 app, that can be installed with pip:
 
 ```
+python3 -m pip install flowkey_dl
+``
+
+```
 git clone https://github.com/MatthiasLienhard/flowkey_dl.git
 cd flowkey_dl
-pip install .
+python3 -m pip install .
 ```
 
 The gui of the app depends on tkinter which should be included with all standard Python distributions. If you get import errors, try installing it manually, e.g. in linux with

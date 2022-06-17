@@ -1,14 +1,10 @@
 #!/bin/python3
 import requests
 import pkg_resources
-
 import imageio
-
 from PIL import Image, ImageDraw, ImageFont
 from matplotlib import font_manager
-from io import BytesIO
 import numpy as np
-import os
 from PIL.PngImagePlugin import PngImageFile, PngInfo
 
 
@@ -16,7 +12,8 @@ def flowkey_dl(url):
     # url=os.path.dirname(url)+'/{}.png'
     hashstring = strip_url(url)
     try:
-        filename = pkg_resources.resource_filename(__name__, f"raw/{hashstring}.png")
+        filename = pkg_resources.resource_filename(
+            __name__, f"raw/{hashstring}.png")
         img = PngImageFile(filename)
     except FileNotFoundError:
         pass
@@ -34,17 +31,18 @@ def flowkey_dl(url):
             break
         patch = next(iter(imageio.get_reader(r.content, ".png")))
         print(f"loaded patch {i} with shape {patch.shape}")
-        if len(patch.shape) == 3:
+        if len(patch.shape) == 3 and patch.shape[2] == 4:  # rgba
+            imgs.append(patch[:, :, 3])
+        elif len(patch.shape) == 2:  # bw
             imgs.append(patch)
         else:
-            print(f"patch {i} looks strange, ignoring: {patch} \nshape: {patch.shape}")
+            print(f"patch {i} looks strange, " +
+                  "ignoring: {patch} \nshape: {patch.shape}")
         i += 1
     print(f"downloaded {len(imgs)} patches form {url}")
     # print([i.shape for i in imgs])
 
-    imgs_comb = np.hstack(imgs)
-    r, g, b, a = np.rollaxis(imgs_comb, axis=-1)
-    return 255 - a, None, None
+    return np.hstack(imgs), None, None
 
 
 def find_measure(image, min_sz=100):
@@ -53,7 +51,7 @@ def find_measure(image, min_sz=100):
     # at most 5 pixels can be brighter than 100
     lines = np.where((image > 100)[:, 50:-50].sum(1) < image.shape[1] / 2)[0]
 
-    positions = np.where((image > 100)[lines[0] : lines[-1], :].sum(0) < 10)[0]
+    positions = np.where((image > 100)[lines[0]: lines[-1], :].sum(0) < 10)[0]
     measures = [positions[0]]
     for i in positions:
         if i > measures[-1] + min_sz:
@@ -93,7 +91,8 @@ def arange_image(
     mar=50,
 ):
     sel_measures, break_measures, nobreak_measures = [
-        parse_nums(val) for val in (sel_measures, break_measures, nobreak_measures)
+        parse_nums(val) for val in
+        (sel_measures, break_measures, nobreak_measures)
     ]
     out = [Image.fromarray(255 * np.ones((int(height), int(width))))]
     font_type = font_manager.FontProperties(family='serif')
@@ -113,7 +112,7 @@ def arange_image(
         print(f"selecting measures {sel_measures}")
         image = np.hstack(
             [
-                image[:, measures[m - 1] : measures[m]]
+                image[:, measures[m - 1]: measures[m]]
                 for m in sel_measures
                 if m < len(measures)
             ]
@@ -126,8 +125,10 @@ def arange_image(
             if i + 1 not in sel_measures:
                 # offset+=measures[i]-m
                 rm[i + 1] += 1
-        nobreak_measures = [v - rm[v] for v in nobreak_measures if v in sel_measures]
-        break_measures = [v - rm[v] for v in break_measures if v in sel_measures]
+        nobreak_measures = [v - rm[v]
+                            for v in nobreak_measures if v in sel_measures]
+        break_measures = [v - rm[v]
+                          for v in break_measures if v in sel_measures]
         measures = find_measure(image)
 
     offset = measures[0]
@@ -147,9 +148,10 @@ def arange_image(
     for i, ix in enumerate(breaks):
         print(f"{offset}, {ix}")
         if y + image.shape[0] + mar > height:
-            out.append(Image.fromarray(255 * np.ones((int(height), int(width)))))
+            out.append(Image.fromarray(
+                255 * np.ones((int(height), int(width)))))
             y = mar
-        patch = image[:, offset : ix + 1]
+        patch = image[:, offset: ix + 1]
         dim = patch.shape
         patch = Image.fromarray(patch)
         patch = patch.resize((int(x * scale) for x in reversed(dim)))
@@ -182,7 +184,8 @@ def save_png(image, url, author, title):
     metadata = PngInfo()
     metadata.add_text("Title", title)
     metadata.add_text("Author", author)
-    filename = pkg_resources.resource_filename(__name__, f"raw/{strip_url(url)}.png")
+    filename = pkg_resources.resource_filename(
+        __name__, f"raw/{strip_url(url)}.png")
     print(f"saving raw image of sheet {author} - {title} to {filename}")
     Image.fromarray(image).save(filename, pnginfo=metadata)
     # load with PngImageFile(filename)

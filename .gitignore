@@ -1,4 +1,14 @@
-/venv
-flowkey_dl/__pycache__
-.vscode/
-flowkey_dl/raw/
+__pycache__
+.*
+!.gitignore
+src/flowkey_dl/raw/
+*pdf
+# Setuptools distribution folder.
+/dist/
+
+#build directory
+build/
+
+# Python egg metadata, regenerated from source files by setuptools.
+src/*.egg-info
+*.egg-info

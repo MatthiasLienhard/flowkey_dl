@@ -1,0 +1,3 @@
+include VERSION.txt
+include CHANGELOG.md
+include requirements.txt

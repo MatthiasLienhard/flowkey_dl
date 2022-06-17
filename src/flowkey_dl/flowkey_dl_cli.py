@@ -3,7 +3,8 @@ from flowkey_dl import flowkey_dl, arange_image, save_pdf
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Sheet Music downloader for flowkey")
+    parser = argparse.ArgumentParser(
+        description="Sheet Music downloader for flowkey")
     parser.add_argument(
         "baseurl", help="Flowkey sheet music base url (url of first image)"
     )
