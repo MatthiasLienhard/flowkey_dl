@@ -8,8 +8,9 @@ This is a python3 app, that can be installed with pip:
 
 ```
 python3 -m pip install flowkey_dl
-``
+```
 
+To get the latest dev version from git, clone the repository and install from the folder. 
 ```
 git clone https://github.com/MatthiasLienhard/flowkey_dl.git
 cd flowkey_dl
