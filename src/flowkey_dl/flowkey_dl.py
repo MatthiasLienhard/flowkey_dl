@@ -32,7 +32,7 @@ def flowkey_dl(url):
         patch = next(iter(imageio.get_reader(r.content, ".png")))
         print(f"loaded patch {i} with shape {patch.shape}")
         if len(patch.shape) == 3 and patch.shape[2] == 4:  # rgba
-            imgs.append(patch[:, :, 3])
+            imgs.append(255 - patch[:, :, 3])
         elif len(patch.shape) == 2:  # bw
             imgs.append(patch)
         else:
