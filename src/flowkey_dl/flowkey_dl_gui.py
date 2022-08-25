@@ -159,10 +159,11 @@ class MainWindow(object):
         save_png(self.image, self.url.get(),
                  self.artist.get(), self.title.get())
         # save processed
-        filename = '_'.join(
+        filename = '_'.join([
             self.artist.get().lower().replace(" ", "_"),
             self.title.get().lower().replace(" ", "_"),
-            strip_url(self.url.get()))+'.pdf'
+            strip_url(self.url.get())
+        ])+'.pdf'
         path = filedialog.asksaveasfilename(
             defaultextension=".pdf", initialfile=filename
         )
