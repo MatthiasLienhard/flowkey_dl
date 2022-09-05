@@ -49,15 +49,22 @@ def find_measure(image, min_sz=100):
     # image is a numpy array
     # there are about 20 pixel above and 15 below the lines.
     # at most 5 pixels can be brighter than 100
-    lines = np.where((image > 100)[:, 50:-50].sum(1) < image.shape[1] / 2)[0]
-
+    
+    # 1) find horizontal lines: at most 20% bright pixels
+    lines = np.where((image > 100)[:, 50:-50].sum(1) < image.shape[1]  * .2 )[0]
+    # 2) find vertical lines (measures): at most 10 bright pixels
     positions = np.where((image > 100)[lines[0]: lines[-1], :].sum(0) < 10)[0]
-    measures = [positions[0]]
-    for i in positions:
-        if i > measures[-1] + min_sz:
-            measures.append(i)
-    print(f"found {len(measures)-1} measures")
-    return measures
+    if len(positions):
+        measures = [positions[0]]
+        for i in positions:
+            if i > measures[-1] + min_sz:
+                measures.append(i)
+        print(f"found {len(measures)-1} measures")
+        return measures
+    print(f"Error: No measures found in image. Darkest point is {image.min()}.")
+    print(f"Longest Vertical line (>=100) is {(image < 100).sum(0).max()}, should be > {lines[-1]-lines[0]-10}")
+    return [0]
+
 
 
 def parse_nums(val=None):
