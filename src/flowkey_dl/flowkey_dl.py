@@ -49,9 +49,9 @@ def find_measure(image, min_sz=100):
     # image is a numpy array
     # there are about 20 pixel above and 15 below the lines.
     # at most 5 pixels can be brighter than 100
-    
+
     # 1) find horizontal lines: at most 20% bright pixels
-    lines = np.where((image > 100)[:, 50:-50].sum(1) < image.shape[1]  * .2 )[0]
+    lines = np.where((image > 100)[:, 50:-50].sum(1) < image.shape[1] * .2)[0]
     # 2) find vertical lines (measures): at most 10 bright pixels
     positions = np.where((image > 100)[lines[0]: lines[-1], :].sum(0) < 10)[0]
     if len(positions):
@@ -61,10 +61,11 @@ def find_measure(image, min_sz=100):
                 measures.append(i)
         print(f"found {len(measures)-1} measures")
         return measures
-    print(f"Error: No measures found in image. Darkest point is {image.min()}.")
-    print(f"Longest Vertical line (>=100) is {(image < 100).sum(0).max()}, should be > {lines[-1]-lines[0]-10}")
+    print(
+        f"Error: No measures found in image. Darkest point is {image.min()}.")
+    print(
+        f"Longest Vertical line (>=100) is {(image < 100).sum(0).max()}, should be > {lines[-1]-lines[0]-10}")
     return [0]
-
 
 
 def parse_nums(val=None):
@@ -194,7 +195,13 @@ def save_png(image, url, author, title):
     filename = pkg_resources.resource_filename(
         __name__, f"raw/{strip_url(url)}.png")
     print(f"saving raw image of sheet {author} - {title} to {filename}")
-    Image.fromarray(image).save(filename, pnginfo=metadata)
+    try:
+        Image.fromarray(image).save(filename, pnginfo=metadata)
+    except FileNotFoundError:
+        print(
+            f'Warning: raw image can not be saved, no raw folder found at {filename}')
+    except Exception:
+        print("Warning: raw image can not be saved, will be downloaded again next time.")
     # load with PngImageFile(filename)
 
 

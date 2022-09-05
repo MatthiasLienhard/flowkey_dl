@@ -157,7 +157,8 @@ class MainWindow(object):
     def save(self):
         # save raw
         save_png(self.image, self.url.get(),
-                 self.artist.get(), self.title.get())
+                self.artist.get(), self.title.get())
+
         # save processed
         filename = '_'.join([
             self.artist.get().lower().replace(" ", "_"),
