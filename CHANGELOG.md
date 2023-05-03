@@ -1,4 +1,7 @@
 # CHANGELOG
+
+## 0.1.5 
+* fixed issue "looks strange, ignoring" related to imageio version (Issue #22)
 ## 0.1.4 
 * prevent crash if raw images cannot be saved. (Issue #18)
 ## 0.1.3

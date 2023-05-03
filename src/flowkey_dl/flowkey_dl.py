@@ -29,7 +29,7 @@ def flowkey_dl(url):
         r = requests.get(url.format(i))
         if r.content[-6:-1] == b"Error":
             break
-        patch = next(iter(imageio.get_reader(r.content, ".png")))
+        patch = imageio.imread(r.content, format='png', pilmode="RGBA")
         print(f"loaded patch {i} with shape {patch.shape}")
         if len(patch.shape) == 3 and patch.shape[2] == 4:  # rgba
             imgs.append(255 - patch[:, :, 3])
@@ -37,7 +37,7 @@ def flowkey_dl(url):
             imgs.append(patch)
         else:
             print(f"patch {i} looks strange, " +
-                  "ignoring: {patch} \nshape: {patch.shape}")
+                  f"ignoring: {patch} \nshape: {patch.shape}")
         i += 1
     print(f"downloaded {len(imgs)} patches form {url}")
     # print([i.shape for i in imgs])
