@@ -175,17 +175,16 @@ def load_image(filename):
 
 
 def strip_url(url):
-    if url.startswith("https://flowkeycdn.com/sheets/"):
-        url = url[30:]
-        if "/" in url:
-            url = url[: url.find("/")]
-    return url
+    parts = url.split("/")
+    if len(parts) > 5:
+        return parts[4]
+    return ""
 
 
 def make_url(hashstring, dpi=300):
     if dpi != 300:
         dpi = 150
-    return f"https://flowkeycdn.com/sheets/{hashstring}/{dpi}/" + "{}.png"
+    return f"https://cdn.flowkey.com/sheets/{hashstring}/{dpi}/" + "{}.png"
 
 
 def save_png(image, url, author, title):
@@ -215,12 +214,19 @@ def save_pdf(images, filename):
 
 
 def main():
-    url = "https://flowkeycdn.com/sheets/XXXXX/150/0.png"
-    image = flowkey_dl(url)
+    url = "https://cdn.flowkey.com/sheets/XXXXX/150/0.png"
+    image, _, _ = flowkey_dl(url)
     measure = find_measure(image)
-    r, g, b = [image.copy() for _ in range(3)]
-    r[:, measure] = 255
-    Image.fromarray(np.dstack([r, g, b])).show()
+
+    # Making a copy of the image
+    modified_image = image.copy()
+
+    # Highlighting all the measures with the value 255
+    for m in measure:
+        modified_image[:, m] = 255
+
+    # Displaying the modified image
+    Image.fromarray(modified_image).show()
 
 
 if __name__ == "__main__":
