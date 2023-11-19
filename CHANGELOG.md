@@ -1,5 +1,7 @@
 # CHANGELOG
 
+## 0.1.7 
+* updated Pillow (Issue #29)
 ## 0.1.6 
 * fixed issue with new image link structure (Issue #30)
 ## 0.1.5 

@@ -1,6 +1,6 @@
 requests
 numpy
 imageio
-Pillow
+Pillow > 8.0.0
 matplotlib
 importlib-metadata

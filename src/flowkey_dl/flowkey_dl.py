@@ -107,9 +107,9 @@ def arange_image(
     font_file = font_manager.findfont(font_type)
     fnt = [ImageFont.truetype(font_file, sz) for sz in font_size]
     d = ImageDraw.Draw(out[-1])
-    w, h = d.textsize(title, font=fnt[0])
+    _, _, w, h = d.textbbox((0,0),title, font=fnt[0])
     d.text(((width - w) / 2, mar), title, font=fnt[0], fill=0)
-    w2, h2 = d.textsize(author, font=fnt[1])
+    _, _, w2, h2 = d.textbbox((0,0),author, font=fnt[1])
     d.text((width - mar - w2, mar + h), author, font=fnt[1], fill=0)
 
     print(f"arage images of size {width}x{height}")
