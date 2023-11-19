@@ -10,17 +10,17 @@ from PIL.PngImagePlugin import PngImageFile, PngInfo
 
 def flowkey_dl(url):
     # url=os.path.dirname(url)+'/{}.png'
-    hashstring = strip_url(url)
+    url = strip_url(url)
     try:
         filename = pkg_resources.resource_filename(
-            __name__, f"raw/{hashstring}.png")
+            __name__, f"raw/{url[url.rfind('/')+1:]}.png")
         img = PngImageFile(filename)
     except FileNotFoundError:
         pass
     else:
         print(f"found local file {filename}")
         return np.array(img), img.info.get("Title"), img.info.get("Author")
-    url = make_url(hashstring)
+    url = make_url(url)
     # load with
     imgs = list()
     i = 0
@@ -175,24 +175,28 @@ def load_image(filename):
 
 
 def strip_url(url):
-    parts = url.split("/")
-    if len(parts) > 5:
-        return parts[4]
-    return ""
+    if url.endswith('.png'):
+        return url[:url.rfind('/')]
+    else:
+        return url
 
 
-def make_url(hashstring, dpi=300):
-    if dpi != 300:
-        dpi = 150
-    return f"https://cdn.flowkey.com/sheets/{hashstring}/{dpi}/" + "{}.png"
+def make_url(url):
+    if '/sheets/' in url:
+        return url + "/{}.png"
+    elif '/rendered-sheets/' in url:
+        return url + "/{}@2x.png"
+    else:
+        raise ValueError('Unknown url format')
 
 
 def save_png(image, url, author, title):
     metadata = PngInfo()
     metadata.add_text("Title", title)
     metadata.add_text("Author", author)
+    url=strip_url(url)
     filename = pkg_resources.resource_filename(
-        __name__, f"raw/{strip_url(url)}.png")
+        __name__, f"raw/{url[:url.find['/']]}.png")
     print(f"saving raw image of sheet {author} - {title} to {filename}")
     try:
         Image.fromarray(image).save(filename, pnginfo=metadata)

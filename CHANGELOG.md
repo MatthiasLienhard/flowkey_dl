@@ -1,5 +1,7 @@
 # CHANGELOG
 
+## 0.1.6 
+* fixed issue with new image link structure (Issue #30)
 ## 0.1.5 
 * fixed issue "looks strange, ignoring" related to imageio version (Issue #22)
 ## 0.1.4 
