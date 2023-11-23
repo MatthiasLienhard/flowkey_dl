@@ -196,7 +196,7 @@ def save_png(image, url, author, title):
     metadata.add_text("Author", author)
     url=strip_url(url)
     filename = pkg_resources.resource_filename(
-        __name__, f"raw/{url[:url.find['/']]}.png")
+        __name__, f"raw/{url[:url.find('/')]}.png")
     print(f"saving raw image of sheet {author} - {title} to {filename}")
     try:
         Image.fromarray(image).save(filename, pnginfo=metadata)

@@ -1,5 +1,7 @@
 # CHANGELOG
 
+## 0.1.8
+* Fixing bug preventing "save" action
 ## 0.1.7 
 * updated Pillow (Issue #29)
 ## 0.1.6 

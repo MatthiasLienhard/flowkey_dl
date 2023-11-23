@@ -160,11 +160,9 @@ class MainWindow(object):
                 self.artist.get(), self.title.get())
 
         # save processed
-        filename = '_'.join([
-            self.artist.get().lower().replace(" ", "_"),
-            self.title.get().lower().replace(" ", "_"),
-            strip_url(self.url.get())
-        ])+'.pdf'
+        artist=self.artist.get().lower().replace(" ", "_")
+        title=self.title.get().lower().replace(" ", "_")
+        filename = '_'.join(v for v in [artist, title] if v)+'.pdf'
         path = filedialog.asksaveasfilename(
             defaultextension=".pdf", initialfile=filename
         )
