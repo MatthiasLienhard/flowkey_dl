@@ -24,6 +24,7 @@ def flowkey_dl(url):
     # load with
     imgs = list()
     i = 0
+    initial_shape_size = None
     while True:
         # im = imageio.imread(url.format(i))
         r = requests.get(url.format(i))
@@ -31,6 +32,11 @@ def flowkey_dl(url):
             break
         patch = imageio.imread(r.content, format='png', pilmode="RGBA")
         print(f"loaded patch {i} with shape {patch.shape}")
+        if not initial_shape_size:
+            initial_shape_size = patch.shape[0]
+        if initial_shape_size and patch.shape[0] != initial_shape_size:
+            print("ignoring shape not matching to the first shape's size")
+            break
         if len(patch.shape) == 3 and patch.shape[2] == 4:  # rgba
             imgs.append(255 - patch[:, :, 3])
         elif len(patch.shape) == 2:  # bw
