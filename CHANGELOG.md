@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 0.1.9
+* Updating instructions on URL retrieval
+* Fixed issue with inconsistent image size (#33)
 ## 0.1.8
 * Fixing bug preventing "save" action
 ## 0.1.7 
