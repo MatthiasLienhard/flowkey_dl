@@ -28,7 +28,7 @@ def flowkey_dl(url):
     while True:
         # im = imageio.imread(url.format(i))
         r = requests.get(url.format(i))
-        if r.content[-6:-1] == b"Error":
+        if r.content[-6:-1] == b"Error" or r.content == b'Not Found':
             break
         patch = imageio.imread(r.content, format='png', pilmode="RGBA")
         print(f"loaded patch {i} with shape {patch.shape}")
