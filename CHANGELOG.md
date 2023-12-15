@@ -1,5 +1,6 @@
 # CHANGELOG
-
+## 0.1.10
+* Fixing #37 
 ## 0.1.9
 * Updating instructions on URL retrieval
 * Fixed issue with inconsistent image size (#33)
