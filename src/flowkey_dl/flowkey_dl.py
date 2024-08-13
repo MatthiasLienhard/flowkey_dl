@@ -168,7 +168,7 @@ def arange_image(
         patch = image[:, offset: ix + 1]
         dim = patch.shape
         patch = Image.fromarray(patch)
-        patch = patch.resize((int(x * scale) for x in reversed(dim)))
+        patch = patch.resize([int(x * scale) for x in reversed(dim)])
         out[-1].paste(patch, (mar, y))
         y += patch.height + space
         offset = ix - 1
